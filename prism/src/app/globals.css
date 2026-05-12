@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #000000;
+  --color-surface-0: #0a0a0a;
+  --color-surface-1: #111111;
+  --color-surface-2: #1a1a1a;
+  --color-border: #232323;
+  --color-border-2: #2e2e2e;
+  --color-text-0: #ffffff;
+  --color-text-1: #d4d4d4;
+  --color-text-2: #8a8a8a;
+  --color-text-3: #5a5a5a;
+  --color-primary: #ffffff;
+  --color-primary-fg: #0a0a0a;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-inset-pri: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text-0);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+input:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ----------------------------------------------------------------------------
+ * Chatscope theme — direct class overrides.
+ * Chatscope hard-codes light-blue colors in its class rules and does NOT read
+ * any CSS variables, so we override the actual selectors with !important.
+ * ------------------------------------------------------------------------- */
+
+/* Shells: kill the default white/blue chrome, use our page bg + hairline border. */
+.cs-main-container,
+.cs-chat-container,
+.cs-message-list {
+  background-color: var(--color-bg) !important;
+  border: none !important;
+}
+
+/* Incoming bubble (assistant + welcome) — dark gray with white text. */
+.cs-message--incoming .cs-message__content {
+  background-color: var(--color-surface-2) !important;
+  color: var(--color-text-0) !important;
+  border-radius: 10px !important;
+}
+
+/* Outgoing bubble (user) — white with black text, matches our primary CTA. */
+.cs-message--outgoing .cs-message__content {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-fg) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Defense-in-depth: strip any inline bg/color from descendants of a
+ * text-content node inside an outgoing bubble. Pasted spans/divs with inline
+ * styles (e.g. `style="background-color: #1a1a1a; color: white"`) get
+ * neutralized so the bubble stays pure white with black text. The upload
+ * file-card is NOT affected because it has explicit !important backgrounds. */
+.cs-message--outgoing .cs-message__text-content * {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* When a bubble contains custom content (e.g. our upload file-card), strip the
+ * bubble's own background/padding/shadow so the card sits flush — otherwise the
+ * outgoing bubble's white wraps the card in an ugly double-border. */
+.cs-message__content:has(.upload-card) {
+  background-color: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 10px !important;
+}
+
+/* Preserve newlines in message text + wrap long unbroken runs (URLs, code). */
+.cs-message__content,
+.cs-message__text-content,
+.cs-message__custom-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Input row container — sits on the page bg with a hairline top border. */
+.cs-message-input {
+  background-color: var(--color-bg) !important;
+  border-top: 1px solid var(--color-border) !important;
+}
+
+/* The editor wrapper — dark card with a subtle border. */
+.cs-message-input__content-editor-wrapper {
+  background-color: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border-2) !important;
+  border-radius: 10px !important;
+}
+.cs-message-input--disabled .cs-message-input__content-editor-wrapper {
+  background-color: var(--color-surface-0) !important;
+  color: var(--color-text-3) !important;
+}
+
+/* The contenteditable itself + its container — transparent so the wrapper's
+ * background shows; text in white. */
+.cs-message-input__content-editor,
+.cs-message-input__content-editor-container {
+  background-color: transparent !important;
+  color: var(--color-text-0) !important;
+}
+.cs-message-input--disabled .cs-message-input__content-editor,
+.cs-message-input--disabled .cs-message-input__content-editor-container {
+  color: var(--color-text-3) !important;
+}
+
+/* Placeholder color (Chatscope uses a ::before with a `content` attr). */
+.cs-message-input__content-editor[data-placeholder]:empty::before {
+  color: var(--color-text-3) !important;
+}
+
+/* Send + attach buttons — gray default, white on hover, dim on disabled. */
+.cs-button.cs-button--send,
+.cs-button.cs-button--attachment {
+  color: var(--color-text-2) !important;
+}
+.cs-button.cs-button--send:hover:not(:disabled),
+.cs-button.cs-button--attachment:hover:not(:disabled) {
+  color: var(--color-text-0) !important;
+}
+.cs-button.cs-button--send:disabled,
+.cs-button.cs-button--attachment:disabled {
+  color: var(--color-text-3) !important;
+  opacity: 1 !important;
+}
+
+/* Typing indicator — transparent bg, tertiary-text-color dots. */
+.cs-typing-indicator,
+.cs-typing-indicator__indicator,
+.cs-typing-indicator__text {
+  background: transparent !important;
+  color: var(--color-text-2) !important;
+}
+.cs-typing-indicator__dot {
+  background-color: var(--color-text-2) !important;
+}
+
+/* ----------------------------------------------------------------------------
+ * Upload file-card — rendered inside <Message.CustomContent> by ChatWindow.
+ * ------------------------------------------------------------------------- */
+.upload-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-2);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 220px;
+  max-width: 360px;
+}
+.upload-card__head {
+  background: var(--color-border);
+  color: var(--color-text-0);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.upload-card__icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #ffffff 50%, #2a2a2a 50%);
+  flex-shrink: 0;
+}
+.upload-card__body {
+  padding: 8px 10px;
+  color: var(--color-text-1);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}

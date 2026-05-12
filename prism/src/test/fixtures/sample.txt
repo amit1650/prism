@@ -1,0 +1,4 @@
+Prism Test Document
+
+This is a sample text file used by the E2E test for file uploads.
+It contains a few sentences so the parsed preview has some content.

@@ -1,0 +1,18 @@
+# OS / editor noise
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Claude Code local-only settings (per-developer, not shared)
+.claude/settings.local.json
+
+# Visual companion + brainstorm scratch artifacts
+.superpowers/
+
+# Logs
+*.log
+
+# Playwright test output (also redundantly ignored by prism/.gitignore for that subtree)
+test-results/
+playwright-report/
