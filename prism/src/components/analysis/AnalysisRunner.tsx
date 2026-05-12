@@ -93,7 +93,7 @@ export function AnalysisRunner({ projectId }: AnalysisRunnerProps) {
     >
       <div className="mx-auto mb-4 w-6 h-6 border-2 border-text-2 border-t-transparent rounded-full animate-spin" />
       <p className="text-sm text-text-1">{LABELS[labelIndex]}</p>
-      <p className="text-xs text-text-3 mt-2">This usually takes 30–60 seconds.</p>
+      <p className="text-xs text-text-2 mt-2">This usually takes 30–60 seconds.</p>
     </div>
   )
 }

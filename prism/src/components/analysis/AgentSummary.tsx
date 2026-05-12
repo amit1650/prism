@@ -74,7 +74,7 @@ export function AgentSummary({ graph, projectId }: AgentSummaryProps) {
                 </li>
               ))}
               {section.items.length > 5 && (
-                <li className="text-xs text-text-3">
+                <li className="text-xs text-text-2">
                   + {section.items.length - 5} more
                 </li>
               )}
@@ -84,7 +84,7 @@ export function AgentSummary({ graph, projectId }: AgentSummaryProps) {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-xs text-text-3">Version {graph.version}</p>
+        <p className="text-xs text-text-2">Version {graph.version}</p>
         <Link
           href={`/project/${projectId}/qa/wizard`}
           className="inline-flex items-center gap-1.5 bg-primary text-primary-fg px-4 py-2 rounded-md text-sm font-semibold shadow-sm shadow-inset-pri"

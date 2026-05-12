@@ -2,7 +2,7 @@ import path from 'path'
 import { test, expect, signUpInUI } from './helpers'
 
 test('full chat → analyse → summary → proceed flow', async ({ page, testUser }) => {
-  test.setTimeout(180_000) // 3 minutes — analysis can take up to ~60s
+  test.setTimeout(180_000) // 3 minutes — analysis can take up to ~60s with the LLM
 
   await signUpInUI(page, testUser)
 
@@ -34,13 +34,9 @@ test('full chat → analyse → summary → proceed flow', async ({ page, testUs
   await page.getByRole('link', { name: /analyse project/i }).click()
   await page.waitForURL(/\/project\/[^/]+\/qa$/)
 
-  // Spinner with rotating label.
-  await expect(page.locator('[role="status"]')).toBeVisible()
-  await expect(
-    page.getByText(/reading your chat|extracting facts|looking for conflicts|surfacing assumptions|identifying gaps/i)
-  ).toBeVisible()
-
-  // Wait up to 90s for the summary to render.
+  // Wait up to 90s for the summary to render. The spinner/label are an
+  // implementation detail that may already be gone by the time we get here
+  // if Groq responds quickly.
   await expect(page.getByRole('heading', { name: /here.{1,3}s what i understood/i })).toBeVisible({
     timeout: 90_000,
   })
