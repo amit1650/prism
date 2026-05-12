@@ -1,7 +1,7 @@
 import path from 'path'
 import { test, expect, signUpInUI } from './helpers'
 
-test('full chat flow: signup → message → upload → analyse stub', async ({ page, testUser }) => {
+test('full chat flow: signup → message → upload → analyse', async ({ page, testUser }) => {
   await signUpInUI(page, testUser)
 
   // Create a project from the welcome screen
@@ -56,8 +56,8 @@ test('full chat flow: signup → message → upload → analyse stub', async ({ 
   // And the assistant's streamed acknowledgement completes.
   await expect(typingIndicator).toHaveCount(0, { timeout: 60_000 })
 
-  // Click "Analyse Project" → stub page
+  // Click "Analyse Project" → M3 QA page (shows AnalysisRunner with role="status")
   await page.getByRole('link', { name: /analyse project/i }).click()
   await page.waitForURL(/\/project\/[^/]+\/qa$/)
-  await expect(page.getByRole('heading', { name: /q&a wizard/i })).toBeVisible()
+  await expect(page.getByRole('status')).toBeVisible()
 })

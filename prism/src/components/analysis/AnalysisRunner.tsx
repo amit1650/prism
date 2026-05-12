@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { startTransition, useEffect, useRef, useState } from 'react'
 import { AgentSummary } from './AgentSummary'
 import type { KnowledgeGraph } from '@/types/knowledge'
 
@@ -31,9 +31,11 @@ export function AnalysisRunner({ projectId }: AnalysisRunnerProps) {
   }, [graph, error])
 
   useEffect(() => {
-    setError(null)
-    setGraph(null)
-    setLabelIndex(0)
+    startTransition(() => {
+      setError(null)
+      setGraph(null)
+      setLabelIndex(0)
+    })
     const abort = new AbortController()
     requestRef.current = abort
     const timeoutId = setTimeout(() => abort.abort(), 180_000)
