@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository State
 
-The product name is **Prism**. **M1 (Auth + Dashboard) and M2 (Chat Intake) are implemented and passing all tests** under `prism/`. The `Docs/` folder remains the planning source; `prism/` contains the actual Next.js codebase. Milestones M3–M5 are still spec-only and will be designed/planned/implemented one at a time.
+The product name is **Prism**. **M1 (Auth + Dashboard), M2 (Chat Intake), and M3 (Parsing Pipeline) are implemented and passing all tests** under `prism/`. The `Docs/` folder remains the planning source; `prism/` contains the actual Next.js codebase. Milestones M4–M5 are still spec-only and will be designed/planned/implemented one at a time.
 
 For active design work, see `docs/superpowers/specs/` and `docs/superpowers/plans/`.
 
@@ -17,6 +17,15 @@ For active design work, see `docs/superpowers/specs/` and `docs/superpowers/plan
 - **OpenAI primary + Groq fallback** (not Anthropic) — `src/lib/llm/client.ts` exports `getLLM()` which returns an `openai` SDK client pointed at OpenAI (if `OPENAI_API_KEY` set) or Groq (`baseURL: https://api.groq.com/openai/v1`). Default models: `gpt-4o-mini` / `llama-3.3-70b-versatile`, env-overridable via `OPENAI_MODEL` / `GROQ_MODEL`. Used in `/api/chat` (streaming).
 - **Chatscope a11y workaround** — `ChatWindow` patches `aria-label` on Chatscope's send + attach buttons via a `useEffect` (Chatscope itself doesn't set them). Pattern: query `.cs-button--attachment` / `.cs-button--send` from a `rootRef` and set the attribute. Apply the same pattern if more Chatscope a11y gaps surface.
 - **No git yet** — repo is intentionally not a git repo (user deferred init). Most plan tasks skipped their commit step.
+
+## M3 — Parsing Pipeline (shipped)
+
+- `/api/parse` (POST) — runs 4 sequential LLM stages over chat + uploaded documents and writes a `KnowledgeGraph` to Supabase. Stages: entity extraction, conflict detection (skipped if `sources.length < 2`), assumption surfacing, gap analysis. Assembly is a pure merge (no LLM call). All-or-nothing persistence — partial graphs never saved.
+- **LLM JSON mode** — `lib/llm/json.ts` wraps `getLLM()` with `response_format: { type: 'json_object' }` and a single parse-failure retry. Every stage prompt is in `lib/parse/prompts.ts` and explicitly mentions "JSON" (required by OpenAI's JSON mode contract).
+- **`project_knowledge` table** — one row per project, JSONB-heavy, RLS-scoped via parent project (same pattern as M1/M2). `UNIQUE(project_id)` enforces single-row.
+- **Status flow** — `drafting` → `clarifying` happens on the **first** successful analysis only. Re-analyses bump `version` but do not re-flip status.
+- **UI** — `/project/[id]/qa` replaces the M2 stub. Branches: graph exists → `<AgentSummary>` + `<ReanalyseButton>`; no graph but content exists → `<AnalysisRunner>` (spinner + rotating label); no content → "Have a chat first" empty state. `/qa/wizard` is the new M4 stub.
+- **Monochrome design** — `AgentSummary` reuses `<StatusDot>` for category indicators (confirmed=ready, inferred=clarifying, open questions=drafting, conflicts=exported); no semantic colors. Body muted text uses `text-text-2`; `text-text-3` is decorative-only (dots, dividers) — using it for body text fails WCAG AA contrast on dark bg.
 
 ## M2 — Chat Intake (shipped)
 
