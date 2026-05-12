@@ -48,4 +48,33 @@ test.describe('Accessibility — no serious/critical violations', () => {
     )
     expect(serious, JSON.stringify(serious, null, 2)).toEqual([])
   })
+
+  test('/project/[id]/qa (with knowledge graph seeded)', async ({ page, testUser }) => {
+    test.setTimeout(180_000)
+
+    await signUpInUI(page, testUser)
+    await page.getByRole('button', { name: /create your first project/i }).click()
+    await page.getByLabel(/project name/i).fill('A11y parse project')
+    await page.getByRole('button', { name: /create & start/i }).click()
+    await page.waitForURL(/\/project\/[^/]+$/)
+
+    const editor = page.locator('.cs-message-input__content-editor')
+    const typing = page.locator('.cs-typing-indicator')
+    await editor.click()
+    await page.keyboard.type('We are building a small SaaS dashboard for analytics.')
+    await page.keyboard.press('Enter')
+    await typing.waitFor({ state: 'visible', timeout: 10_000 })
+    await typing.waitFor({ state: 'hidden', timeout: 60_000 })
+
+    await page.getByRole('link', { name: /analyse project/i }).click()
+    await page.waitForURL(/\/project\/[^/]+\/qa$/)
+
+    await page.getByRole('heading', { name: /here.{1,3}s what i understood/i }).waitFor({ timeout: 90_000 })
+
+    const results = await new AxeBuilder({ page }).analyze()
+    const serious = results.violations.filter(
+      (v) => v.impact === 'serious' || v.impact === 'critical'
+    )
+    expect(serious, JSON.stringify(serious, null, 2)).toEqual([])
+  })
 })
